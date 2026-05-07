@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Boing Max</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root{
+  --ora:#E8650A;--ora2:#F5A05A;--ora-light:#FEF3EB;
+  --grn:#52B043;--grn-light:#EDF7EB;
+  --dark:#1A1A1A;--gray1:#F7F7F5;--gray2:#EDEDE9;
+  --text:#1A1A1A;--text2:#6B6B60;--white:#fff;
+  --radius:14px;--radius-sm:10px;
+  --nav-h:64px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:'Nunito',sans-serif;background:var(--gray1);color:var(--text);min-height:100vh;padding-bottom:var(--nav-h);}
+
+/* ── TOP BAR ── */
+.topbar{
+  position:sticky;top:0;z-index:200;
+  background:var(--ora);
+  padding:0 16px;height:54px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.logo-wrap{display:flex;align-items:center;gap:10px;}
+.logo-icon{width:34px;height:34px;background:rgba(255,255,255,0.2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:19px;}
+.logo-name{font-family:'Fredoka One',cursive;font-size:20px;color:white;letter-spacing:.3px;}
+.topbar-right{display:flex;align-items:center;gap:8px;}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:#a3e635;}
+.sync-dot.err{background:#f87171;}
+.sync-dot.load{background:#fbbf24;animation:pulse .8s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+.total-chip{background:rgba(255,255,255,0.2);color:white;font-size:12px;font-weight:700;padding:4px 10px;border-radius:99px;}
+
+/* ── PROMO STRIP ── */
+.promo-strip{background:#C45508;color:white;padding:8px 16px;font-size:12px;font-weight:700;display:none;align-items:center;gap:6px;text-align:center;justify-content:center;}
+
+/* ── BOTTOM NAV ── */
+.bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;height:var(--nav-h);
+  background:var(--dark);
+  display:flex;align-items:stretch;
+  z-index:200;
+  border-top:1px solid rgba(255,255,255,0.07);
+}
+.bn-item{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;cursor:pointer;border:none;background:none;
+  color:rgba(255,255,255,0.4);font-size:10px;font-weight:700;
+  transition:color .15s;padding:8px 0;
+}
+.bn-item .bn-icon{font-size:22px;line-height:1;}
+.bn-item.active{color:var(--ora);}
+.bn-item.active .bn-icon{transform:scale(1.1);}
+
+/* ── CONTENT ── */
+.content{padding:16px;}
+.view{display:none;}.view.active{display:block;}
+
+/* ── CARDS ── */
+.card{background:var(--white);border-radius:var(--radius);padding:18px;margin-bottom:14px;border:1.5px solid var(--gray2);}
+.card-title{font-family:'Fredoka One',cursive;font-size:16px;color:var(--dark);margin-bottom:14px;display:flex;align-items:center;gap:7px;}
+
+/* ── PILLS ── */
+.pill-group{display:flex;flex-wrap:wrap;gap:8px;}
+.pill{
+  padding:9px 15px;border-radius:99px;font-size:13px;font-weight:700;
+  cursor:pointer;border:2px solid var(--gray2);background:var(--gray1);color:var(--text2);
+  transition:all .15s;user-select:none;
+}
+.pill.sel-ora{background:var(--ora);border-color:var(--ora);color:white;}
+.pill.sel-grn{background:var(--grn);border-color:var(--grn);color:white;}
+
+/* ── PAGO ── */
+.pago-row{display:flex;gap:8px;}
+.pago-btn{
+  flex:1;padding:11px;border-radius:var(--radius-sm);border:2px solid var(--gray2);
+  font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;cursor:pointer;
+  background:var(--gray1);color:var(--text2);transition:all .15s;
+}
+.pago-btn.sel{background:var(--grn-light);border-color:var(--grn);color:#1B5E20;}
+
+/* ── TOTAL BOX ── */
+.total-box{
+  background:var(--ora-light);border-radius:var(--radius-sm);
+  padding:14px 16px;display:flex;align-items:center;justify-content:space-between;margin-top:14px;
+}
+.tb-label{font-size:11px;font-weight:700;color:var(--ora);text-transform:uppercase;letter-spacing:.5px;}
+.tb-val{font-family:'Fredoka One',cursive;font-size:28px;color:var(--ora);}
+
+/* ── BIG BUTTON ── */
+.btn-main{
+  width:100%;padding:14px;border:none;border-radius:var(--radius-sm);
+  font-family:'Fredoka One',cursive;font-size:17px;cursor:pointer;
+  margin-top:12px;color:white;letter-spacing:.4px;transition:opacity .15s;
+}
+.btn-main:active{opacity:.8;}
+.btn-ora{background:var(--ora);}
+.btn-grn{background:var(--grn);}
+
+/* ── METRICS ── */
+.metrics-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.metric{border-radius:var(--radius);padding:14px 16px;border:1.5px solid var(--gray2);background:var(--white);}
+.metric.accent{background:var(--ora);border-color:var(--ora);}
+.metric.accent2{background:var(--grn);border-color:var(--grn);}
+.m-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);margin-bottom:4px;}
+.metric.accent .m-label,.metric.accent2 .m-label{color:rgba(255,255,255,.7);}
+.m-val{font-family:'Fredoka One',cursive;font-size:20px;line-height:1;}
+.metric.accent .m-val,.metric.accent2 .m-val{color:white;}
+
+/* ── TIENDA ── */
+.product-item{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 12px;border-radius:var(--radius-sm);border:1.5px solid var(--gray2);
+  background:var(--white);margin-bottom:8px;
+}
+.p-name{font-weight:700;font-size:13px;}
+.p-price{color:var(--text2);font-size:12px;margin-top:1px;}
+.btn-add{
+  width:32px;height:32px;border-radius:8px;background:var(--ora-light);
+  border:none;color:var(--ora);font-size:22px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;
+}
+.btn-add:active{background:var(--ora);color:white;}
+.carrito-item{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--gray2);font-size:13px;}
+.carrito-item:last-child{border-bottom:none;}
+.btn-rm{background:#FEE2E2;color:#991B1B;border:none;border-radius:6px;width:26px;height:26px;cursor:pointer;font-weight:700;font-size:14px;flex-shrink:0;}
+
+/* ── HISTORIAL ── */
+.hist-item{
+  padding:12px;border-radius:var(--radius-sm);border:1.5px solid var(--gray2);
+  background:var(--white);margin-bottom:8px;
+}
+.hi-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
+.hi-desc{font-size:12px;color:var(--text2);margin-top:2px;}
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:99px;font-size:11px;font-weight:700;}
+.b-ora{background:var(--ora-light);color:#7A3000;}
+.b-grn{background:var(--grn-light);color:#1B5E20;}
+.b-blue{background:#EFF6FF;color:#1E40AF;}
+.b-pink{background:#FDF2F8;color:#831843;}
+
+/* ── DASHBOARD ── */
+.week-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+.week-chip{padding:6px 12px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid var(--gray2);color:var(--text2);background:var(--gray1);}
+.week-chip.active{background:var(--ora);color:white;border-color:var(--ora);}
+.day-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:12px;}
+.dbl{width:58px;font-weight:600;flex-shrink:0;font-size:11px;}
+.dbt{flex:1;height:12px;background:var(--gray2);border-radius:99px;overflow:hidden;}
+.dbf{height:100%;border-radius:99px;background:var(--ora);}
+.dbv{width:68px;text-align:right;font-weight:700;color:var(--ora);flex-shrink:0;font-size:12px;}
+.footer-total{background:var(--dark);border-radius:var(--radius);padding:18px;margin-top:4px;}
+.ft-label{color:rgba(255,255,255,.45);font-size:11px;font-weight:700;text-transform:uppercase;margin-bottom:2px;}
+.ft-val{font-family:'Fredoka One',cursive;font-size:28px;color:var(--ora);margin-bottom:10px;}
+.ft-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;}
+.ft-stat{background:rgba(255,255,255,.06);border-radius:8px;padding:8px;text-align:center;}
+.ft-stat-val{font-family:'Fredoka One',cursive;font-size:18px;color:white;}
+.ft-stat-label{font-size:10px;color:rgba(255,255,255,.45);margin-top:1px;}
+
+/* ── CONFIG ── */
+.config-item{display:flex;align-items:center;gap:8px;padding:9px 11px;border-radius:var(--radius-sm);border:1.5px solid var(--gray2);background:var(--gray1);margin-bottom:8px;}
+.config-item input{flex:1;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:13px;font-weight:600;color:var(--text);min-width:0;}
+.config-item input:focus{outline:none;}
+.ci-price{width:80px!important;text-align:right!important;color:var(--ora);font-weight:700!important;}
+.add-row{display:flex;gap:6px;margin-top:10px;}
+.add-row input{flex:1;padding:9px 11px;border:1.5px solid var(--gray2);border-radius:var(--radius-sm);font-family:'Nunito',sans-serif;font-size:13px;min-width:0;}
+.btn-sm{padding:9px 12px;border-radius:var(--radius-sm);border:none;font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;}
+.btn-red{background:#FEE2E2;color:#991B1B;}
+.btn-ora-sm{background:var(--ora-light);color:#7A3000;}
+.btn-save{width:100%;padding:13px;background:var(--ora);color:white;border:none;border-radius:var(--radius-sm);font-family:'Fredoka One',cursive;font-size:16px;cursor:pointer;margin-top:14px;}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:calc(var(--nav-h) + 12px);left:16px;right:16px;background:var(--dark);color:white;padding:13px 16px;border-radius:var(--radius-sm);font-size:13px;font-weight:700;border-left:4px solid var(--grn);z-index:9999;opacity:0;transform:translateY(6px);transition:all .3s;text-align:center;}
+.toast.show{opacity:1;transform:translateY(0);}
+.loading-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9998;display:none;align-items:center;justify-content:center;}
+.loading-box{background:white;border-radius:var(--radius);padding:28px 32px;text-align:center;margin:0 32px;}
+.spinner{width:34px;height:34px;border:3px solid var(--gray2);border-top-color:var(--ora);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 10px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.empty{text-align:center;color:var(--text2);font-size:13px;padding:24px 0;}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="logo-wrap">
+    <div class="logo-icon">🎪</div>
+    <div class="logo-name">Boing Max</div>
+  </div>
+  <div class="topbar-right">
+    <div class="sync-dot" id="sync-dot"></div>
+    <div class="total-chip" id="sb-total">$0 hoy</div>
+  </div>
+</div>
+
+<!-- PROMO STRIP -->
+<div class="promo-strip" id="promo-strip">
+  🎉 ¡Hoy hay promo! 2 personas por <span id="promo-precio">$30.000</span>
+</div>
+
+<!-- CONTENT -->
+<div class="content">
+
+  <!-- REGISTRO -->
+  <div class="view active" id="view-registro">
+    <div class="card">
+      <div class="card-title">⏱️ Tipo de entrada</div>
+      <div class="pill-group" id="entrada-pills"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">🧦 Medias (opcional)</div>
+      <div class="pill-group" id="media-pills">
+        <div class="pill" onclick="selMedia(this,'XS')">XS</div>
+        <div class="pill" onclick="selMedia(this,'S')">S</div>
+        <div class="pill" onclick="selMedia(this,'M')">M</div>
+        <div class="pill" onclick="selMedia(this,'L')">L</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">💳 Pago</div>
+      <div class="pago-row" id="pago-entrada">
+        <button class="pago-btn sel" onclick="selPago(this,'efectivo','entrada')">💵 Efectivo</button>
+        <button class="pago-btn" onclick="selPago(this,'transferencia','entrada')">🏦 Transferencia</button>
+      </div>
+      <div class="total-box">
+        <div class="tb-label">Total a cobrar</div>
+        <div class="tb-val" id="entrada-total">$0</div>
+      </div>
+      <button class="btn-main btn-ora" onclick="registrarEntrada()">✓ Registrar entrada</button>
+    </div>
+  </div>
+
+  <!-- TIENDA -->
+  <div class="view" id="view-tienda">
+    <div class="card">
+      <div class="card-title">🥤 Bebidas</div>
+      <div id="lista-bebidas"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">🚀 Juguetes</div>
+      <div id="lista-juguetes"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">🛒 Carrito</div>
+      <div id="carrito-list"><div class="empty">Sin artículos</div></div>
+      <div style="margin-top:12px;border-top:1.5px solid var(--gray2);padding-top:12px">
+        <div class="pago-row" id="pago-tienda">
+          <button class="pago-btn sel" onclick="selPago(this,'efectivo','tienda')">💵 Efectivo</button>
+          <button class="pago-btn" onclick="selPago(this,'transferencia','tienda')">🏦 Transferencia</button>
+        </div>
+        <div class="total-box" style="margin-top:12px">
+          <div class="tb-label">Total carrito</div>
+          <div class="tb-val" id="carrito-total">$0</div>
+        </div>
+        <button class="btn-main btn-grn" onclick="cobrarTienda()">✓ Cobrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- HISTORIAL -->
+  <div class="view" id="view-historial">
+    <div class="metrics-grid">
+      <div class="metric accent" style="grid-column:1/-1">
+        <div class="m-label">💰 Total del día</div>
+        <div class="m-val" id="h-total">$0</div>
+      </div>
+      <div class="metric"><div class="m-label">💵 Efectivo</div><div class="m-val" id="h-efec">$0</div></div>
+      <div class="metric"><div class="m-label">🏦 Transferencia</div><div class="m-val" id="h-transf">$0</div></div>
+    </div>
+    <div id="hist-list"><div class="empty">Sin transacciones hoy</div></div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="view" id="view-dashboard">
+    <div class="metrics-grid">
+      <div class="metric accent" style="grid-column:1/-1">
+        <div class="m-label">Total del mes</div>
+        <div class="m-val" id="d-total">$0</div>
+      </div>
+      <div class="metric accent2"><div class="m-label">👦 Visitantes</div><div class="m-val" id="d-visit">0</div></div>
+      <div class="metric"><div class="m-label">💵 Efectivo</div><div class="m-val" id="d-efec">$0</div></div>
+      <div class="metric"><div class="m-label">🏦 Transf.</div><div class="m-val" id="d-transf">$0</div></div>
+      <div class="metric"><div class="m-label">📅 Días activos</div><div class="m-val" id="d-dias">0</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📊 Ingresos por día</div>
+      <div class="week-chips" id="week-chips"></div>
+      <div id="dash-bars"><div class="empty">⏳ Cargando...</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Entradas vs Tienda</div>
+      <div style="display:flex;gap:14px;margin-bottom:10px;font-size:11px;font-weight:700">
+        <span><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--ora);margin-right:4px"></span>Entradas</span>
+        <span><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--grn);margin-right:4px"></span>Tienda</span>
+      </div>
+      <div style="position:relative;height:160px"><canvas id="chart-donut"></canvas></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Métodos de pago</div>
+      <div style="display:flex;gap:14px;margin-bottom:10px;font-size:11px;font-weight:700">
+        <span><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--ora);margin-right:4px"></span>Efectivo</span>
+        <span><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--grn);margin-right:4px"></span>Transferencia</span>
+      </div>
+      <div style="position:relative;height:160px"><canvas id="chart-pago"></canvas></div>
+    </div>
+
+    <div class="footer-total">
+      <div class="ft-label">Total facturado este mes</div>
+      <div class="ft-val" id="ft-val">$0</div>
+      <div class="ft-stats">
+        <div class="ft-stat"><div class="ft-stat-val" id="ft-entradas">0</div><div class="ft-stat-label">entradas</div></div>
+        <div class="ft-stat"><div class="ft-stat-val" id="ft-ventas">0</div><div class="ft-stat-label">ventas tienda</div></div>
+        <div class="ft-stat"><div class="ft-stat-val" id="ft-dias">0</div><div class="ft-stat-label">días activos</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONFIG -->
+  <div class="view" id="view-config">
+    <div class="card">
+      <div class="card-title">⏱️ Tarifas de entrada</div>
+      <div id="config-tarifas"></div>
+      <div class="add-row">
+        <input id="nt-nom" placeholder="Ej: 2 horas">
+        <input id="nt-pre" type="number" placeholder="Precio" style="width:90px;flex:none">
+        <button class="btn-sm btn-ora-sm" onclick="addTarifa()">+ Agregar</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">🧦 Precio medias (todas las tallas)</div>
+      <div class="config-item">
+        <span style="font-size:13px;font-weight:600">Precio por par</span>
+        <input type="number" id="precio-medias" class="ci-price" style="width:90px;border:1.5px solid var(--gray2);border-radius:6px;padding:5px 8px;">
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">🥤 Bebidas</div>
+      <div id="config-bebidas"></div>
+      <div class="add-row">
+        <input id="nb-nom" placeholder="Nombre bebida">
+        <input id="nb-pre" type="number" placeholder="Precio" style="width:90px;flex:none">
+        <button class="btn-sm btn-ora-sm" onclick="addBebida()">+ Agregar</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">🚀 Juguetes</div>
+      <div id="config-juguetes"></div>
+      <div class="add-row">
+        <input id="nj-nom" placeholder="Nombre juguete">
+        <input id="nj-pre" type="number" placeholder="Precio" style="width:90px;flex:none">
+        <button class="btn-sm btn-ora-sm" onclick="addJuguete()">+ Agregar</button>
+      </div>
+    </div>
+    <button class="btn-save" onclick="guardarConfig()">💾 Guardar configuración</button>
+  </div>
+
+</div><!-- /content -->
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="bn-item active" id="bn-registro" onclick="showView('registro',this)">
+    <span class="bn-icon">➕</span><span>Entrada</span>
+  </button>
+  <button class="bn-item" id="bn-tienda" onclick="showView('tienda',this)">
+    <span class="bn-icon">🛒</span><span>Tienda</span>
+  </button>
+  <button class="bn-item" id="bn-historial" onclick="showView('historial',this)">
+    <span class="bn-icon">📋</span><span>Historial</span>
+  </button>
+  <button class="bn-item" id="bn-dashboard" onclick="showView('dashboard',this)">
+    <span class="bn-icon">📊</span><span>Dashboard</span>
+  </button>
+  <button class="bn-item" id="bn-config" onclick="showView('config',this)">
+    <span class="bn-icon">⚙️</span><span>Config</span>
+  </button>
+</nav>
+
+<div class="loading-overlay" id="loading-overlay">
+  <div class="loading-box">
+    <div class="spinner"></div>
+    <div style="font-weight:600;color:var(--text2);font-size:13px" id="loading-msg">Guardando...</div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const GS_URL="https://script.google.com/macros/s/AKfycbxvbaaqCrDd31B38loDWIXpBulnB76aCsLHbitkXyIMKzsNht1yhE2EGhKJM1B8-x8B/exec";
+
+let CONFIG={
+  tarifas:[
+    {id:'1h',nombre:'1 hora',precio:12000},
+    {id:'30m',nombre:'30 minutos',precio:7000},
+    {id:'promo',nombre:'Promo 2×1 Mar/Jue',precio:30000,esPromo:true},
+  ],
+  precioMedias:3000,
+  bebidas:[
+    {id:'b1',nombre:'Agua 300ml',precio:2000,icon:'🥤'},
+    {id:'b2',nombre:'Jugo Hit 250ml',precio:3000,icon:'🧃'},
+    {id:'b3',nombre:'Gaseosa mini',precio:2500,icon:'🫗'},
+    {id:'b4',nombre:'Chocolate caliente',precio:4000,icon:'☕'},
+    {id:'b5',nombre:'Teterito 150ml',precio:2000,icon:'🍼'},
+  ],
+  juguetes:[
+    {id:'j1',nombre:'Pelota pequeña',precio:5000,icon:'⚽'},
+    {id:'j2',nombre:'Burbujas de jabón',precio:4000,icon:'🫧'},
+    {id:'j3',nombre:'Plastilina x4',precio:6000,icon:'🎨'},
+    {id:'j4',nombre:'Mini rompecabezas',precio:7000,icon:'🧩'},
+  ]
+};
+
+let entrada=null,media=null,pagoE='efectivo',pagoT='efectivo';
+let carrito=[],transacciones=[];
+let totalDia=0,efecDia=0,transfDia=0,visitDia=0;
+let dashDatos=[],semActiva=0;
+let donutInst=null,pagoInst=null;
+
+function fmt(n){return '$'+Math.round(n).toLocaleString('es-CO');}
+function sumK(arr,k){return arr.reduce((s,d)=>s+(d[k]||0),0);}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,5);}
+
+function toast(msg,tipo='ok'){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.style.borderLeftColor=tipo==='ok'?'var(--grn)':'var(--ora)';
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+function setSync(s){
+  const d=document.getElementById('sync-dot');
+  d.className='sync-dot'+(s==='err'?' err':s==='load'?' load':'');
+}
+function showLoading(m='Guardando...'){document.getElementById('loading-overlay').style.display='flex';document.getElementById('loading-msg').textContent=m;}
+function hideLoading(){document.getElementById('loading-overlay').style.display='none';}
+
+// ── SHEETS ──
+async function enviarSheets(hoja,enc,fila){
+  setSync('load');
+  try{
+    await fetch(GS_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({hoja,encabezados:enc,fila})});
+    setSync('ok');return true;
+  }catch(e){setSync('err');return false;}
+}
+async function cargarSheets(hoja){
+  try{
+    const r=await fetch(GS_URL+'?hoja='+encodeURIComponent(hoja));
+    const d=await r.json();return d.filas||[];
+  }catch(e){return[];}
+}
+
+// ── FECHA ──
+function updateFecha(){
+  const now=new Date();
+  const d=now.getDay();
+  const isPromo=d===2||d===4;
+  document.getElementById('promo-strip').style.display=isPromo?'flex':'none';
+  document.getElementById('promo-precio').textContent=fmt(CONFIG.tarifas.find(t=>t.esPromo)?.precio||30000);
+}
+
+// ── NAV ──
+function showView(v,btn){
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.bn-item').forEach(el=>el.classList.remove('active'));
+  document.getElementById('view-'+v).classList.add('active');
+  if(btn) btn.classList.add('active');
+  window.scrollTo(0,0);
+  if(v==='historial') renderHistorial();
+  if(v==='dashboard') cargarDashboard();
+  if(v==='config') renderConfig();
+}
+
+// ── ENTRADA ──
+function renderEntradaPills(){
+  const c=document.getElementById('entrada-pills');c.innerHTML='';
+  CONFIG.tarifas.forEach((t,i)=>{
+    const d=document.createElement('div');
+    d.className='pill'+(i===0?' sel-ora':'');
+    d.textContent=(t.esPromo?'🎉 ':'')+t.nombre+' — '+fmt(t.precio);
+    d.onclick=()=>selEntrada(d,t);
+    c.appendChild(d);
+    if(i===0) entrada=t;
+  });
+  updateTotalEntrada();
+}
+function selEntrada(el,t){
+  document.querySelectorAll('#entrada-pills .pill').forEach(p=>p.classList.remove('sel-ora'));
+  el.classList.add('sel-ora');entrada=t;updateTotalEntrada();
+}
+function selMedia(el,talla){
+  if(el.classList.contains('sel-grn')){el.classList.remove('sel-grn');media=null;}
+  else{document.querySelectorAll('#media-pills .pill').forEach(p=>p.classList.remove('sel-grn'));el.classList.add('sel-grn');media={talla,precio:CONFIG.precioMedias};}
+  updateTotalEntrada();
+}
+function selPago(el,tipo,ctx){
+  const g=ctx==='entrada'?'pago-entrada':'pago-tienda';
+  document.querySelectorAll('#'+g+' .pago-btn').forEach(b=>b.classList.remove('sel'));
+  el.classList.add('sel');
+  if(ctx==='entrada') pagoE=tipo; else pagoT=tipo;
+}
+function updateTotalEntrada(){
+  if(!entrada){document.getElementById('entrada-total').textContent='$0';return;}
+  document.getElementById('entrada-total').textContent=fmt(entrada.precio+(media?media.precio:0));
+}
+async function registrarEntrada(){
+  if(!entrada){toast('Selecciona un tipo de entrada','err');return;}
+  const total=entrada.precio+(media?media.precio:0);
+  const now=new Date();
+  const hora=now.toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});
+  const fecha=now.toLocaleDateString('es-CO');
+  let desc=entrada.nombre;if(media) desc+=' + Medias '+media.talla;
+  showLoading('Guardando en Google Sheets...');
+  const ok=await enviarSheets('Transacciones',
+    ['Fecha','Hora','Tipo','Descripcion','Pago','Total'],
+    [fecha,hora,'Entrada',desc,pagoE,total]
+  );
+  hideLoading();
+  transacciones.unshift({hora,tipo:'Entrada',desc,pago:pagoE,total});
+  acum(total,pagoE);visitDia+=(entrada.esPromo?2:1);
+  updateSbTotal();
+  toast(ok?'✅ Entrada guardada':'✅ Registrada (sin conexión)');
+}
+
+// ── TIENDA ──
+function renderProductos(){
+  function lista(arr,id){
+    const c=document.getElementById(id);c.innerHTML='';
+    arr.forEach(it=>{
+      const d=document.createElement('div');d.className='product-item';
+      d.innerHTML=`<div><div class="p-name">${it.icon||'•'} ${it.nombre}</div><div class="p-price">${fmt(it.precio)}</div></div><button class="btn-add" onclick="addCarrito('${it.id}','${it.nombre}',${it.precio})">+</button>`;
+      c.appendChild(d);
+    });
+  }
+  lista(CONFIG.bebidas,'lista-bebidas');
+  lista(CONFIG.juguetes,'lista-juguetes');
+}
+function addCarrito(id,nombre,precio){
+  const ex=carrito.find(c=>c.id===id);
+  if(ex) ex.qty++;else carrito.push({id,nombre,precio,qty:1});
+  renderCarrito();
+}
+function removeCarrito(id){
+  const i=carrito.findIndex(c=>c.id===id);
+  if(i>=0){carrito[i].qty--;if(carrito[i].qty<=0)carrito.splice(i,1);}
+  renderCarrito();
+}
+function renderCarrito(){
+  const c=document.getElementById('carrito-list');
+  if(!carrito.length){c.innerHTML='<div class="empty">Sin artículos</div>';document.getElementById('carrito-total').textContent='$0';return;}
+  let tot=0;
+  c.innerHTML=carrito.map(it=>{tot+=it.precio*it.qty;return`<div class="carrito-item"><span style="font-weight:600">${it.nombre} <span style="color:var(--text2)">×${it.qty}</span></span><div style="display:flex;align-items:center;gap:8px"><span style="font-weight:700;color:var(--ora)">${fmt(it.precio*it.qty)}</span><button class="btn-rm" onclick="removeCarrito('${it.id}')">×</button></div></div>`;}).join('');
+  document.getElementById('carrito-total').textContent=fmt(tot);
+}
+async function cobrarTienda(){
+  if(!carrito.length){toast('El carrito está vacío','err');return;}
+  const tot=carrito.reduce((s,i)=>s+i.precio*i.qty,0);
+  const desc=carrito.map(i=>i.nombre+(i.qty>1?' ×'+i.qty:'')).join(', ');
+  const now=new Date();
+  const hora=now.toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});
+  const fecha=now.toLocaleDateString('es-CO');
+  showLoading('Guardando venta...');
+  const ok=await enviarSheets('Transacciones',
+    ['Fecha','Hora','Tipo','Descripcion','Pago','Total'],
+    [fecha,hora,'Tienda',desc,pagoT,tot]
+  );
+  hideLoading();
+  transacciones.unshift({hora,tipo:'Tienda',desc,pago:pagoT,total:tot});
+  acum(tot,pagoT);carrito=[];renderCarrito();updateSbTotal();
+  toast(ok?'✅ Venta guardada':'✅ Registrada (sin conexión)');
+}
+
+function acum(val,pago){
+  totalDia+=val;if(pago==='efectivo') efecDia+=val;else transfDia+=val;
+}
+function updateSbTotal(){
+  document.getElementById('sb-total').textContent=fmt(totalDia)+' hoy';
+}
+
+// ── HISTORIAL ──
+function renderHistorial(){
+  document.getElementById('h-total').textContent=fmt(totalDia);
+  document.getElementById('h-efec').textContent=fmt(efecDia);
+  document.getElementById('h-transf').textContent=fmt(transfDia);
+  const c=document.getElementById('hist-list');
+  if(!transacciones.length){c.innerHTML='<div class="empty">Sin transacciones hoy</div>';return;}
+  c.innerHTML=transacciones.map(t=>`
+    <div class="hist-item">
+      <div class="hi-top">
+        <div style="display:flex;gap:6px;align-items:center">
+          <span class="badge ${t.tipo==='Entrada'?'b-ora':'b-pink'}">${t.tipo}</span>
+          <span class="badge ${t.pago==='efectivo'?'b-grn':'b-blue'}">${t.pago}</span>
+        </div>
+        <div style="font-family:'Fredoka One',cursive;font-size:17px;color:var(--ora)">${fmt(t.total)}</div>
+      </div>
+      <div class="hi-desc">${t.desc} · ${t.hora}</div>
+    </div>`).join('');
+}
+
+// ── DASHBOARD ──
+async function cargarDashboard(){
+  document.getElementById('dash-bars').innerHTML='<div class="empty">⏳ Cargando de Google Sheets...</div>';
+  setSync('load');
+  try{
+    const filas=await cargarSheets('Transacciones');
+    setSync('ok');
+    if(filas.length<=1){document.getElementById('dash-bars').innerHTML='<div class="empty">Sin datos aún</div>';return;}
+    const rows=filas.slice(1);
+    const porDia={};
+    rows.forEach(r=>{
+      const fecha=r[0]||'';const tipo=r[2]||'';const pago=r[4]||'efectivo';const total=parseFloat(r[5])||0;
+      if(!porDia[fecha]) porDia[fecha]={fecha,entradas:0,tienda:0,efec:0,transf:0,visitantes:0,nE:0,nV:0};
+      if(tipo==='Entrada'){porDia[fecha].entradas+=total;porDia[fecha].nE++;porDia[fecha].visitantes+=1;}
+      else{porDia[fecha].tienda+=total;porDia[fecha].nV++;}
+      if(pago==='efectivo') porDia[fecha].efec+=total;else porDia[fecha].transf+=total;
+    });
+    dashDatos=Object.values(porDia).sort((a,b)=>a.fecha.localeCompare(b.fecha));
+    renderDashUI();
+  }catch(e){
+    setSync('err');
+    document.getElementById('dash-bars').innerHTML='<div class="empty" style="color:#991B1B">⚠️ Sin conexión con Google Sheets</div>';
+  }
+}
+function renderDashUI(){
+  const datos=dashDatos;if(!datos.length)return;
+  const totMes=sumK(datos,'entradas')+sumK(datos,'tienda');
+  const visits=sumK(datos,'visitantes');
+  const efec=sumK(datos,'efec');
+  const transf=sumK(datos,'transf');
+  const nE=sumK(datos,'nE');const nV=sumK(datos,'nV');
+  document.getElementById('d-total').textContent=fmt(totMes);
+  document.getElementById('d-visit').textContent=visits;
+  document.getElementById('d-efec').textContent=fmt(efec);
+  document.getElementById('d-transf').textContent=fmt(transf);
+  document.getElementById('d-dias').textContent=datos.length;
+  document.getElementById('ft-val').textContent=fmt(totMes);
+  document.getElementById('ft-entradas').textContent=nE;
+  document.getElementById('ft-ventas').textContent=nV;
+  document.getElementById('ft-dias').textContent=datos.length;
+
+  // Semanas
+  const nSem=Math.ceil(datos.length/7);
+  const chips=document.getElementById('week-chips');
+  let html='<div class="week-chip active" onclick="setSemDash(0,this)">Todo</div>';
+  for(let i=0;i<nSem;i++) html+=`<div class="week-chip" onclick="setSemDash(${i+1},this)">Sem ${i+1}</div>`;
+  chips.innerHTML=html;
+  buildBarras(datos);
+
+  if(donutInst) donutInst.destroy();
+  if(pagoInst) pagoInst.destroy();
+  donutInst=new Chart(document.getElementById('chart-donut'),{type:'doughnut',data:{labels:['Entradas','Tienda'],datasets:[{data:[sumK(datos,'entradas'),sumK(datos,'tienda')],backgroundColor:['#E8650A','#52B043'],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>fmt(ctx.raw)}}}}});
+  pagoInst=new Chart(document.getElementById('chart-pago'),{type:'doughnut',data:{labels:['Efectivo','Transferencia'],datasets:[{data:[efec,transf],backgroundColor:['#E8650A','#52B043'],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>fmt(ctx.raw)}}}}});
+}
+function setSemDash(s,el){
+  document.querySelectorAll('.week-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');semActiva=s;
+  const datos=s===0?dashDatos:dashDatos.filter((_,i)=>Math.floor(i/7)===(s-1));
+  buildBarras(datos);
+}
+function buildBarras(datos){
+  if(!datos.length)return;
+  const max=Math.max(...datos.map(d=>d.entradas+d.tienda));
+  document.getElementById('dash-bars').innerHTML=datos.map(d=>{
+    const tot=d.entradas+d.tienda;const pct=Math.round(tot/max*100);
+    return`<div class="day-bar-row"><div class="dbl">${d.fecha.split('/').slice(0,2).join('/')}</div><div class="dbt"><div class="dbf" style="width:${pct}%"></div></div><div class="dbv">${fmt(tot)}</div></div>`;
+  }).join('');
+}
+
+// ── CONFIG ──
+function renderConfig(){
+  document.getElementById('config-tarifas').innerHTML=CONFIG.tarifas.map((t,i)=>`
+    <div class="config-item">
+      <span>${t.esPromo?'🎉':'⏱️'}</span>
+      <input value="${t.nombre}" onchange="CONFIG.tarifas[${i}].nombre=this.value">
+      <input type="number" value="${t.precio}" class="ci-price" onchange="CONFIG.tarifas[${i}].precio=parseInt(this.value)">
+      <button class="btn-sm btn-red" onclick="CONFIG.tarifas.splice(${i},1);renderConfig()">✕</button>
+    </div>`).join('');
+  document.getElementById('precio-medias').value=CONFIG.precioMedias;
+  document.getElementById('config-bebidas').innerHTML=CONFIG.bebidas.map((b,i)=>`
+    <div class="config-item">
+      <span>${b.icon||'🥤'}</span>
+      <input value="${b.nombre}" onchange="CONFIG.bebidas[${i}].nombre=this.value">
+      <input type="number" value="${b.precio}" class="ci-price" onchange="CONFIG.bebidas[${i}].precio=parseInt(this.value)">
+      <button class="btn-sm btn-red" onclick="CONFIG.bebidas.splice(${i},1);renderConfig()">✕</button>
+    </div>`).join('');
+  document.getElementById('config-juguetes').innerHTML=CONFIG.juguetes.map((j,i)=>`
+    <div class="config-item">
+      <span>${j.icon||'🚀'}</span>
+      <input value="${j.nombre}" onchange="CONFIG.juguetes[${i}].nombre=this.value">
+      <input type="number" value="${j.precio}" class="ci-price" onchange="CONFIG.juguetes[${i}].precio=parseInt(this.value)">
+      <button class="btn-sm btn-red" onclick="CONFIG.juguetes.splice(${i},1);renderConfig()">✕</button>
+    </div>`).join('');
+}
+function addTarifa(){
+  const n=document.getElementById('nt-nom').value.trim();const p=parseInt(document.getElementById('nt-pre').value);
+  if(!n||!p){toast('Completa nombre y precio','err');return;}
+  CONFIG.tarifas.push({id:uid(),nombre:n,precio:p});
+  document.getElementById('nt-nom').value='';document.getElementById('nt-pre').value='';renderConfig();
+}
+function addBebida(){
+  const n=document.getElementById('nb-nom').value.trim();const p=parseInt(document.getElementById('nb-pre').value);
+  if(!n||!p){toast('Completa nombre y precio','err');return;}
+  CONFIG.bebidas.push({id:uid(),nombre:n,precio:p,icon:'🥤'});
+  document.getElementById('nb-nom').value='';document.getElementById('nb-pre').value='';renderConfig();
+}
+function addJuguete(){
+  const n=document.getElementById('nj-nom').value.trim();const p=parseInt(document.getElementById('nj-pre').value);
+  if(!n||!p){toast('Completa nombre y precio','err');return;}
+  CONFIG.juguetes.push({id:uid(),nombre:n,precio:p,icon:'🚀'});
+  document.getElementById('nj-nom').value='';document.getElementById('nj-pre').value='';renderConfig();
+}
+async function guardarConfig(){
+  CONFIG.precioMedias=parseInt(document.getElementById('precio-medias').value)||3000;
+  showLoading('Guardando configuración...');
+  const ok=await enviarSheets('Config',['Clave','Valor'],['config_json',JSON.stringify(CONFIG)]);
+  localStorage.setItem('boingmax_config',JSON.stringify(CONFIG));
+  hideLoading();
+  renderEntradaPills();renderProductos();updateFecha();
+  toast(ok?'✅ Configuración guardada':'✅ Guardada localmente');
+}
+async function cargarConfig(){
+  const local=localStorage.getItem('boingmax_config');
+  if(local){try{CONFIG=JSON.parse(local);}catch(e){}}
+  try{
+    const filas=await cargarSheets('Config');
+    if(filas.length>1){const row=filas.find(r=>r[0]==='config_json');if(row&&row[1]){CONFIG=JSON.parse(row[1]);localStorage.setItem('boingmax_config',row[1]);}}
+  }catch(e){}
+  renderEntradaPills();renderProductos();renderConfig();updateFecha();
+}
+
+updateFecha();
+setInterval(updateFecha,60000);
+cargarConfig();
+</script>
+</body>
+</html>
