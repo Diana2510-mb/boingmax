@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Boing Max - Punto de Venta</title>
+    <title>Boing Max - Sistema Oficial</title>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --ora: #E8650A; --ora2: #F5A05A; --ora-light: #FEF3EB;
@@ -12,10 +13,10 @@
             --text: #1A1A1A; --white: #fff; --radius: 16px;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Nunito', sans-serif; background: var(--gray1); color: var(--text); padding-bottom: 90px; }
+        body { font-family: 'Nunito', sans-serif; background: var(--gray1); color: var(--text); padding-bottom: 90px; overflow-x: hidden; }
         
         /* HEADER */
-        .topbar { background: var(--ora); color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .topbar { background: var(--ora); color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
         .logo-txt { font-family: 'Fredoka One', cursive; font-size: 22px; }
         .sync-box { display: flex; align-items: center; background: rgba(255,255,255,0.2); padding: 6px 14px; border-radius: 20px; font-weight: 800; font-size: 14px; }
         .sync-dot { width: 9px; height: 9px; border-radius: 50%; background: #4ade80; margin-right: 8px; }
@@ -25,36 +26,33 @@
         /* CONTENIDO */
         .container { padding: 15px; max-width: 800px; margin: auto; }
         .card { background: white; border-radius: var(--radius); padding: 20px; margin-bottom: 15px; border: 1px solid var(--gray2); box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
-        .card-title { font-weight: 800; font-size: 16px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; color: var(--ora); }
+        .card-title { font-weight: 800; font-size: 16px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; color: var(--text); border-bottom: 2px solid var(--ora-light); padding-bottom: 8px; }
         
-        /* BOTONES SELECCIÓN */
+        /* SELECCIÓN */
         .pill-group { display: flex; flex-wrap: wrap; gap: 10px; }
-        .pill { flex: 1; min-width: 120px; padding: 15px; border-radius: 12px; background: var(--white); border: 2.5px solid var(--gray2); cursor: pointer; font-weight: 700; text-align: center; transition: 0.2s; color: #555; }
-        .pill.active { background: var(--ora); color: white; border-color: var(--ora); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(232,101,10,0.2); }
+        .pill { flex: 1; min-width: 100px; padding: 15px; border-radius: 12px; background: var(--white); border: 2.5px solid var(--gray2); cursor: pointer; font-weight: 700; text-align: center; color: #555; transition: 0.2s; }
+        .pill.active { background: var(--ora); color: white; border-color: var(--ora); transform: translateY(-2px); }
 
-        /* LISTA TIENDA */
-        .item-tienda { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: var(--white); border: 1.5px solid var(--gray2); border-radius: 12px; margin-bottom: 8px; cursor: pointer; }
-        .item-tienda:active { background: var(--ora-light); }
-        .it-info b { display: block; font-size: 15px; }
-        .it-info span { font-size: 12px; color: #888; }
+        /* TIENDA */
+        .item-tienda { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: var(--gray1); border-radius: 12px; margin-bottom: 8px; cursor: pointer; border: 1px solid transparent; }
+        .item-tienda:active { background: var(--ora-light); border-color: var(--ora2); }
         .it-price { font-weight: 800; color: var(--ora); font-size: 16px; }
 
-        /* TOTALES Y REGISTRO */
+        /* BANNER TOTAL */
         .banner-total { background: var(--ora-light); padding: 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; margin-top: 10px; border: 2px dashed var(--ora); }
         .val-total { font-family: 'Fredoka One', cursive; font-size: 32px; color: var(--ora); }
         .btn-registrar { width: 100%; background: var(--ora); color: white; border: none; padding: 20px; border-radius: 12px; font-family: 'Fredoka One', cursive; font-size: 20px; cursor: pointer; margin-top: 15px; box-shadow: 0 6px 0 #b04d08; }
         .btn-registrar:active { transform: translateY(3px); box-shadow: 0 3px 0 #b04d08; }
 
-        /* DASHBOARD RESUMEN */
+        /* DASHBOARD */
         .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
         .dash-card { background: var(--dark); color: white; padding: 15px; border-radius: 12px; text-align: center; }
-        .dash-card small { font-size: 10px; text-transform: uppercase; opacity: 0.7; }
-        .dash-card div { font-family: 'Fredoka One', cursive; font-size: 20px; margin-top: 5px; }
+        .dash-card div { font-family: 'Fredoka One', cursive; font-size: 20px; color: var(--ora2); }
 
         /* NAV */
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 75px; background: var(--dark); display: flex; justify-content: space-around; align-items: center; z-index: 1000; }
-        .nav-item { color: #888; border: none; background: none; font-size: 11px; font-weight: 700; display: flex; flex-direction: column; align-items: center; flex: 1; }
-        .nav-item.active { color: var(--ora2); }
+        .nav-item { color: #888; border: none; background: none; font-size: 11px; font-weight: 700; display: flex; flex-direction: column; align-items: center; flex: 1; height: 100%; justify-content: center; }
+        .nav-item.active { color: var(--ora2); background: rgba(255,255,255,0.05); }
         .nav-icon { font-size: 24px; margin-bottom: 4px; }
 
         .view { display: none; }
@@ -75,8 +73,8 @@
     
     <div id="view-entrada" class="view active">
         <div class="card">
-            <div class="card-title">⏱️ Seleccionar Entrada</div>
-            <div class="pill-group">
+            <div class="card-title">⏱️ Tiempo de Juego</div>
+            <div class="pill-group" id="group-tiempos">
                 <div class="pill" onclick="setT(this, '1 Hora', 20000)">1 Hora<br>$20.000</div>
                 <div class="pill" onclick="setT(this, '30 Min', 15000)">30 Min<br>$15.000</div>
                 <div class="pill" onclick="setT(this, 'Promo 2x1', 30000)">Promo 2x1<br>$30.000</div>
@@ -84,8 +82,8 @@
         </div>
         
         <div class="card">
-            <div class="card-title">🧦 ¿Lleva Medias? (SÍ=$8.500)</div>
-            <div class="pill-group">
+            <div class="card-title">🧦 Medias (XS, S, M, L) - $8.500</div>
+            <div class="pill-group" id="group-medias">
                 <div class="pill" onclick="setM(this, 'XS', 8500)">XS</div>
                 <div class="pill" onclick="setM(this, 'S', 8500)">S</div>
                 <div class="pill" onclick="setM(this, 'M', 8500)">M</div>
@@ -94,13 +92,8 @@
         </div>
 
         <div class="card">
-            <div class="card-title">💵 Pago</div>
-            <div class="pill-group" style="margin-bottom:15px;">
-                <div class="pill active" onclick="setPago('Efectivo', this)">Efectivo</div>
-                <div class="pill" onclick="setPago('Transferencia', this)">Transferencia</div>
-            </div>
             <div class="banner-total">
-                <span style="font-weight: 800;">TOTAL A COBRAR:</span>
+                <span style="font-weight: 800;">TOTAL:</span>
                 <span id="label-total" class="val-total">$0</span>
             </div>
             <button class="btn-registrar" onclick="enviarVenta('Entrada')">REGISTRAR ENTRADA</button>
@@ -110,17 +103,16 @@
     <div id="view-tienda" class="view">
         <div class="card">
             <div class="card-title">🥤 Bebidas y Snacks</div>
-            <div id="lista-bebidas"></div>
+            <div id="list-bebidas"></div>
         </div>
         <div class="card">
             <div class="card-title">🚀 Juguetes</div>
-            <div id="lista-juguetes"></div>
+            <div id="list-juguetes"></div>
         </div>
         <div class="card" id="card-carrito" style="display:none; border: 2px solid var(--grn);">
             <div class="card-title" style="color:var(--grn)">🛒 Carrito Actual</div>
-            <div id="items-carrito" style="margin-bottom:10px;"></div>
+            <div id="items-carrito"></div>
             <div class="banner-total" style="background:#eef9ed; border-color:var(--grn);">
-                <span style="color:var(--grn); font-weight:800;">TOTAL TIENDA:</span>
                 <span id="total-carrito" class="val-total" style="color:var(--grn)">$0</span>
             </div>
             <button class="btn-registrar" onclick="enviarVenta('Tienda')" style="background:var(--grn); box-shadow: 0 6px 0 #3d8c32;">COBRAR TIENDA</button>
@@ -129,12 +121,11 @@
 
     <div id="view-dash" class="view">
         <div class="dash-grid">
-            <div class="dash-card"><small>Entradas</small><div id="dash-e">$0</div></div>
-            <div class="dash-card"><small>Tienda</small><div id="dash-t">$0</div></div>
+            <div class="dash-card">Entradas Hoy<div id="dash-e">$0</div></div>
+            <div class="dash-card">Tienda Hoy<div id="dash-t">$0</div></div>
         </div>
-        <div class="card">
-            <div class="card-title">📊 Ventas del Mes</div>
-            <canvas id="chartVentas" height="250"></canvas>
+        <div class="card" style="height: 350px;">
+            <canvas id="chartVentas"></canvas>
         </div>
     </div>
 
@@ -147,120 +138,92 @@
     <button class="nav-item" onclick="location.reload()"><span class="nav-icon">🔄</span>Sinc</button>
 </nav>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-// PEGA TU URL AQUÍ
+// --- URL DE TU GOOGLE APPS SCRIPT ---
 const GS_URL = "https://script.google.com/macros/s/AKfycbxvbaaqCrDd31B38loDWIXpBulnB76aCsLHbitkXyIMKzsNht1yhE2EGhKJM1B8-x8B/exec";
 
-const PRODUCTOS = [
-    {cat:'b', n:'Agua 300ml', p:2000}, {cat:'b', n:'Jugo Hit', p:3000},
-    {cat:'b', n:'Gaseosa mini', p:2500}, {cat:'b', n:'Chocolate', p:4000},
-    {cat:'j', n:'Pelota', p:5000}, {cat:'j', n:'Burbujas', p:4000},
-    {cat:'j', n:'Plastilina', p:6000}, {cat:'j', n:'Rompecabezas', p:7000}
+const TIENDA = [
+    {c:'b', n:'Agua Cristal', p:2000}, {c:'b', n:'Jugo Hit', p:3000}, {c:'b', n:'Gaseosa Mini', p:2500},
+    {c:'j', n:'Pelota Loca', p:5000}, {c:'j', n:'Burbujas', p:4000}, {c:'j', n:'Mini Rompecabezas', p:7000}
 ];
 
-let sel = { t:null, m:null, pago:'Efectivo' };
-let carrito = [];
+let sel = { t: null, m: null, cart: [] }, chart = null;
 
 window.onload = () => {
-    renderTienda();
-    actualizarTotales();
+    TIENDA.forEach(p => {
+        const html = `<div class="item-tienda" onclick="add('${p.n}',${p.p})"><b>${p.n}</b><span class="it-price">$${p.p.toLocaleString()}</span></div>`;
+        document.getElementById(p.c === 'b' ? 'list-bebidas' : 'list-juguetes').innerHTML += html;
+    });
+    actualizarDatos();
 };
 
-function renderTienda() {
-    const listB = document.getElementById('lista-bebidas');
-    const listJ = document.getElementById('lista-juguetes');
-    
-    PRODUCTOS.forEach(i => {
-        const html = `<div class="item-tienda" onclick="addCar('${i.n}',${i.p})">
-            <div class="it-info"><b>${i.n}</b><span>Tocar para agregar</span></div>
-            <div class="it-price">$${i.p.toLocaleString()}</div>
-        </div>`;
-        if(i.cat === 'b') listB.innerHTML += html; else listJ.innerHTML += html;
-    });
+function setT(el, n, p) {
+    document.querySelectorAll('#group-tiempos .pill').forEach(x => x.classList.remove('active'));
+    el.classList.add('active'); sel.t = {n, p}; calc();
 }
+function setM(el, n, p) {
+    const was = el.classList.contains('active');
+    document.querySelectorAll('#group-medias .pill').forEach(x => x.classList.remove('active'));
+    if(!was) { el.classList.add('active'); sel.m = {n, p}; } else { sel.m = null; }
+    calc();
+}
+function calc() { document.getElementById('label-total').innerText = "$" + ((sel.t?.p || 0) + (sel.m?.p || 0)).toLocaleString(); }
 
-function setT(el, n, p) { 
-    document.querySelectorAll('#view-entrada .pill-group:first-of-type .pill').forEach(x => x.classList.remove('active'));
-    el.classList.add('active'); sel.t = {n,p}; calc(); 
-}
-function setM(el, n, p) { 
-    const isActive = el.classList.contains('active');
-    document.querySelectorAll('#view-entrada .card:nth-child(2) .pill').forEach(x => x.classList.remove('active'));
-    if(!isActive) { el.classList.add('active'); sel.m = {n,p}; } else { sel.m = null; }
-    calc(); 
-}
-function setPago(t, el) { sel.pago = t; el.parentNode.querySelectorAll('.pill').forEach(x => x.classList.remove('active')); el.classList.add('active'); }
-
-function calc() {
-    let total = (sel.t?.p || 0) + (sel.m?.p || 0);
-    document.getElementById('label-total').innerText = "$" + total.toLocaleString();
-}
-
-function addCar(n, p) {
-    carrito.push({n, p});
+function add(n, p) {
+    sel.cart.push({n, p});
     document.getElementById('card-carrito').style.display = 'block';
     let t = 0;
-    document.getElementById('items-carrito').innerHTML = carrito.map(i => {
-        t += i.p;
-        return `<div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #eee"><span>${i.n}</span><b>$${i.p.toLocaleString()}</b></div>`;
-    }).join('');
+    document.getElementById('items-carrito').innerHTML = sel.cart.map(i => { t += i.p; return `<div style="padding:5px 0; border-bottom:1px solid #eee; display:flex; justify-content:space-between;"><span>${i.n}</span><b>$${i.p}</b></div>`; }).join('');
     document.getElementById('total-carrito').innerText = "$" + t.toLocaleString();
 }
 
 async function enviarVenta(tipo) {
-    let total, detalle;
-    if(tipo === 'Entrada') {
-        if(!sel.t) return alert("Selecciona una entrada");
-        total = (sel.t.p) + (sel.m ? sel.m.p : 0);
-        detalle = sel.t.n + (sel.m ? " + Medias "+sel.m.n : "");
-    } else {
-        total = carrito.reduce((s, i) => s + i.p, 0);
-        detalle = carrito.map(i => i.n).join(", ");
-    }
-
-    document.getElementById('sync-dot').className = "sync-dot loading";
-    const data = { hoja: "Transacciones", fila: [new Date().toLocaleDateString(), new Date().toLocaleTimeString(), tipo, detalle, sel.pago, total] };
+    let tot = tipo === 'Entrada' ? (sel.t.p + (sel.m?.p || 0)) : sel.cart.reduce((s, i) => s + i.p, 0);
+    let det = tipo === 'Entrada' ? (sel.t.n + (sel.m ? " + Medias " + sel.m.n : "")) : sel.cart.map(i => i.n).join(", ");
     
-    try {
-        await fetch(GS_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
-        alert("¡Venta registrada con éxito!");
-        location.reload();
-    } catch(e) { alert("Error al conectar"); }
+    if (tipo === 'Entrada' && !sel.t) return alert("Selecciona tiempo");
+    
+    document.getElementById('sync-dot').className = "sync-dot loading";
+    const data = { hoja: "Transacciones", fila: [new Date().toLocaleDateString(), new Date().toLocaleTimeString(), tipo, det, "Efectivo", tot] };
+    
+    await fetch(GS_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
+    alert("¡Venta Guardada!");
+    location.reload();
 }
 
-async function actualizarTotales() {
+async function actualizarDatos() {
     try {
-        const r = await fetch(GS_URL + "?hoja=Transacciones");
-        const d = await r.json();
+        const res = await fetch(GS_URL + "?hoja=Transacciones");
+        const json = await res.json();
         const hoy = new Date().toLocaleDateString();
-        let totalHoy = 0, eHoy = 0, tHoy = 0;
+        let e = 0, t = 0;
         
-        d.filas.forEach(f => {
+        json.filas.forEach(f => {
             if(f[0] === hoy) {
-                let p = parseFloat(f[5] || 0);
-                totalHoy += p;
-                if(f[2] === 'Entrada') eHoy += p; else tHoy += p;
+                let val = parseFloat(f[5] || 0);
+                if(f[2] === 'Entrada') e += val; else t += val;
             }
         });
         
-        document.getElementById('top-total').innerText = "$" + totalHoy.toLocaleString() + " hoy";
-        document.getElementById('dash-e').innerText = "$" + eHoy.toLocaleString();
-        document.getElementById('dash-t').innerText = "$" + tHoy.toLocaleString();
+        document.getElementById('top-total').innerText = "$" + (e + t).toLocaleString() + " hoy";
+        document.getElementById('dash-e').innerText = "$" + e.toLocaleString();
+        document.getElementById('dash-t').innerText = "$" + t.toLocaleString();
         
-        // Gráfica simple
-        new Chart(document.getElementById('chartVentas'), {
-            type: 'bar',
-            data: { labels: ['Entradas', 'Tienda'], datasets: [{ data: [eHoy, tHoy], backgroundColor: ['#E8650A', '#52B043'] }] }
+        if (chart) chart.destroy();
+        chart = new Chart(document.getElementById('chartVentas'), {
+            type: 'doughnut',
+            data: { labels: ['Entradas', 'Tienda'], datasets: [{ data: [e, t], backgroundColor: ['#E8650A', '#52B043'], borderWeight: 0 }] },
+            options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
         });
-    } catch(e) {}
+    } catch (e) { console.log("Error cargando Dashboard"); }
 }
 
-function v(v, btn) {
+function v(view, btn) {
     document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
-    document.getElementById('view-'+v).classList.add('active');
+    document.getElementById('view-' + view).classList.add('active');
     document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active'));
     btn.classList.add('active');
+    if (view === 'dash') actualizarDatos();
 }
 </script>
 </body>
