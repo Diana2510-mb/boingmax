@@ -2,8 +2,8 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-    <title>Boing Max Oficial</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Boing Max - Sistema Oficial</title>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
     <style>
@@ -12,33 +12,44 @@
             --grn: #52B043; --grn-light: #EDF7EB;
             --dark: #1A1A1A; --gray1: #F7F7F5; --gray2: #EDEDE9;
             --text: #1A1A1A; --text2: #6B6B60; --white: #fff;
-            --radius: 14px; --radius-sm: 10px; --nav-h: 65px;
+            --radius: 14px; --radius-sm: 10px; --nav-h: 68px;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Nunito', sans-serif; background: var(--gray1); color: var(--text); padding-bottom: 80px; }
         
-        /* Estilos de la barra superior */
-        .topbar { background: var(--ora); color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .sync-dot { width: 10px; height: 10px; border-radius: 50%; background: #4ade80; margin-right: 5px; }
+        /* Topbar Estilo Boing Max */
+        .topbar { background: var(--ora); color: white; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .logo-txt { font-family: 'Fredoka One', cursive; font-size: 20px; display: flex; align-items: center; gap: 8px; }
+        .sync-box { display: flex; align-items: center; background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 800; }
+        .sync-dot { width: 8px; height: 8px; border-radius: 50%; background: #4ade80; margin-right: 8px; }
         .sync-dot.loading { background: #fbbf24; animation: pulse 1s infinite; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
         /* Contenedores */
-        .container { padding: 15px; max-width: 600px; margin: auto; }
-        .card { background: white; border-radius: var(--radius); padding: 20px; margin-bottom: 15px; border: 1px solid var(--gray2); }
-        .card-title { font-family: 'Fredoka One', cursive; font-size: 18px; margin-bottom: 15px; color: var(--ora); }
+        .container { padding: 15px; max-width: 650px; margin: auto; }
+        .card { background: white; border-radius: var(--radius); padding: 18px; margin-bottom: 15px; border: 1px solid var(--gray2); }
+        .card-title { font-weight: 800; font-size: 15px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; color: var(--text); }
+        
+        /* Píldoras de Selección */
+        .pill-group { display: flex; flex-wrap: wrap; gap: 8px; }
+        .pill { padding: 10px 16px; border-radius: 99px; background: var(--gray1); border: 2px solid var(--gray2); cursor: pointer; font-weight: 700; font-size: 13px; color: var(--text2); transition: 0.2s; }
+        .pill.active { background: var(--ora); color: white; border-color: var(--ora); transform: scale(1.03); }
 
-        /* Botones y Píldoras */
-        .pill-group { display: flex; flex-wrap: wrap; gap: 10px; }
-        .pill { padding: 12px 18px; border-radius: 99px; background: var(--gray1); border: 2px solid var(--gray2); cursor: pointer; font-weight: 700; transition: 0.2s; }
-        .pill.active { background: var(--ora); color: white; border-color: var(--ora); }
-        .btn-main { width: 100%; padding: 15px; border-radius: var(--radius-sm); border: none; background: var(--ora); color: white; font-family: 'Fredoka One', cursive; font-size: 18px; cursor: pointer; margin-top: 10px; }
+        /* Tienda Estilo Cuadrícula */
+        .grid-tienda { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .btn-tienda { background: var(--white); border: 2px solid var(--gray2); padding: 12px; border-radius: var(--radius-sm); text-align: left; cursor: pointer; display: flex; flex-direction: column; gap: 4px; }
+        .btn-tienda:active { background: var(--ora-light); }
+        .price-tag { color: var(--ora); font-weight: 800; font-size: 16px; }
 
-        /* Navegación inferior */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: var(--nav-h); background: var(--dark); display: flex; justify-content: space-around; align-items: center; }
-        .nav-item { color: #888; text-decoration: none; font-size: 11px; display: flex; flex-direction: column; align-items: center; border: none; background: none; }
+        /* Barra de Pago */
+        .pago-bar { background: var(--ora-light); padding: 15px; border-radius: var(--radius-sm); display: flex; justify-content: space-between; align-items: center; margin-top: 15px; }
+        .btn-registrar { width: 100%; background: var(--ora); color: white; border: none; padding: 16px; border-radius: var(--radius-sm); font-family: 'Fredoka One', cursive; font-size: 18px; cursor: pointer; margin-top: 15px; box-shadow: 0 4px 0 #b04d08; }
+
+        /* Nav Inferior */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: var(--nav-h); background: var(--dark); display: flex; justify-content: space-around; align-items: center; z-index: 1000; }
+        .nav-item { color: #888; text-decoration: none; font-size: 10px; display: flex; flex-direction: column; align-items: center; border: none; background: none; flex: 1; font-weight: 700; }
         .nav-item.active { color: var(--ora2); }
-        .nav-item span { font-size: 20px; margin-bottom: 2px; }
+        .nav-icon { font-size: 24px; margin-bottom: 2px; }
 
         .view { display: none; }
         .view.active { display: block; }
@@ -47,149 +58,202 @@
 <body>
 
 <div class="topbar">
-    <div style="font-family: 'Fredoka One';">BOING MAX 🎪</div>
-    <div style="display: flex; align-items: center;">
-        <div id="sync-status" class="sync-dot"></div>
-        <div id="total-dia-hoy" style="font-weight: 800;">$0 hoy</div>
+    <div class="logo-txt">🎪 Boing Max</div>
+    <div class="sync-box">
+        <div id="sync-dot" class="sync-dot"></div>
+        <div id="display-total-hoy">$0 hoy</div>
     </div>
 </div>
 
 <div class="container">
-    <div id="view-registro" class="view active">
+    
+    <div id="view-entrada" class="view active">
         <div class="card">
-            <div class="card-title">Seleccionar Entrada</div>
-            <div id="entradas-list" class="pill-group"></div>
+            <div class="card-title">⏱️ Tipo de entrada</div>
+            <div id="list-tiempos" class="pill-group"></div>
+        </div>
+        
+        <div class="card">
+            <div class="card-title">🧦 Medias (opcional)</div>
+            <div id="list-medias" class="pill-group"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">💳 Método de Pago</div>
+            <div class="pill-group">
+                <div class="pill active" onclick="setPago('Efectivo', this)">💵 Efectivo</div>
+                <div class="pill" onclick="setPago('Transferencia', this)">📱 Transferencia</div>
+            </div>
+            <div class="pago-bar">
+                <span style="font-weight: 800; color: var(--ora);">TOTAL A COBRAR:</span>
+                <span id="label-total" style="font-size: 28px; font-weight: 800; color: var(--ora);">$0</span>
+            </div>
+            <button class="btn-registrar" onclick="registrarEntrada()">✓ Registrar entrada</button>
+        </div>
+    </div>
+
+    <div id="view-tienda" class="view">
+        <div class="card">
+            <div class="card-title">🥤 Bebidas y Snacks</div>
+            <div id="grid-bebidas" class="grid-tienda"></div>
         </div>
         <div class="card">
-            <div class="card-title">¿Lleva Medias?</div>
-            <div id="medias-list" class="pill-group">
-                <div class="pill" onclick="toggleMedias(this)">SÍ (Medias)</div>
-            </div>
-        </div>
-        <div class="card">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span>Total a cobrar:</span>
-                <span id="label-total" style="font-size: 24px; font-weight: 800; color: var(--ora);">$0</span>
-            </div>
-            <button class="btn-main" onclick="registrarVenta()">REGISTRAR ENTRADA</button>
+            <div class="card-title">🚀 Juguetes y Otros</div>
+            <div id="grid-juguetes" class="grid-tienda"></div>
         </div>
     </div>
 
     <div id="view-dash" class="view">
         <div class="card">
-            <div class="card-title">Ventas de la Semana</div>
-            <canvas id="ventasChart"></canvas>
+            <div class="card-title">📊 Ventas del Día</div>
+            <div style="height: 300px;"><canvas id="chartHoy"></canvas></div>
         </div>
     </div>
+
 </div>
 
 <nav class="bottom-nav">
-    <button class="nav-item active" onclick="changeView('registro', this)"><span>➕</span>Entrada</button>
-    <button class="nav-item" onclick="changeView('dash', this)"><span>📊</span>Dash</button>
-    <button class="nav-item" onclick="window.location.reload()"><span>🔄</span>Refrescar</button>
+    <button class="nav-item active" onclick="v('entrada', this)"><span class="nav-icon">➕</span>Entrada</button>
+    <button class="nav-item" onclick="v('tienda', this)"><span class="nav-icon">🛒</span>Tienda</button>
+    <button class="nav-item" onclick="v('dash', this); loadChart();"><span class="nav-icon">📊</span>Dash</button>
+    <button class="nav-item" onclick="location.reload()"><span class="nav-icon">🔄</span>Sinc</button>
 </nav>
 
 <script>
-    // 1. PEGA TU URL DE GOOGLE SCRIPT AQUÍ
-    const GS_URL = " https://script.google.com/macros/s/AKfycbxvbaaqCrDd31B38loDWIXpBulnB76aCsLHbitkXyIMKzsNht1yhE2EGhKJM1B8-x8B/exec";
+// URL RECUPERADA DE TU IMAGEN
+const GS_URL = "https://script.google.com/macros/s/AKfycbxvbaaqCrDd31B38loDWIXpBulnB76aCsLHbitkXyIMKzsNht1yhE2EGhKJM1B8-x8B/exec";
 
-    let CONFIG = {
-        entradas: [
-            {nombre: "1 Hora", precio: 12000},
-            {nombre: "30 Min", precio: 7000},
-            {nombre: "Promo 2x1", precio: 15000}
-        ],
-        precioMedias: 3000
-    };
+let CONFIG = {
+    tiempos: [
+        {n: "1 hora semna", p: 20000},
+        {n: "30 minutos semana", p: 15000},
+        {n: "Promo jueves", p: 30000},
+        {n: "Promo Martes", p: 40000},
+        {n: "1 hora fin de semana", p: 25000},
+        {n: "30 minutos fin de semana", p: 20000}
+    ],
+    medias: [
+        {n: "Talla XS", p: 8500},
+        {n: "Talla S", p: 8500},
+        {n: "Talla M", p: 8500},
+        {n: "Talla L", p: 8500}
+    ],
+    tienda: [
+        {cat: "bebida", n: "Agua", p: 2500},
+        {cat: "bebida", n: "Gaseosa", p: 3500},
+        {cat: "bebida", n: "Jugo", p: 3000},
+        {cat: "juguete", n: "Burbujas", p: 5000},
+        {cat: "juguete", n: "Pelota", p: 8000}
+    ]
+};
 
-    let ventaActual = { entrada: null, medias: false };
+let venta = { tiempo: null, media: null, pago: 'Efectivo' };
 
-    // FUNCIÓN CARGAR DATOS AL ABRIR
-    window.onload = async () => {
-        renderEntradas();
-        await actualizarDatosDesdeSheets();
-    };
+window.onload = () => {
+    renderMenu();
+    actualizarSincronizacion();
+};
 
-    async function actualizarDatosDesdeSheets() {
-        const dot = document.getElementById('sync-status');
-        dot.className = "sync-dot loading";
-        
-        try {
-            const res = await fetch(GS_URL + "?hoja=Transacciones");
-            const data = await res.json();
-            
-            let sumaHoy = 0;
-            let fechaHoy = new Date().toLocaleDateString();
-            
-            data.filas.forEach(fila => {
-                if (fila[0] === fechaHoy) {
-                    sumaHoy += parseFloat(fila[5] || 0);
-                }
-            });
-            
-            document.getElementById('total-dia-hoy').textContent = "$" + sumaHoy.toLocaleString() + " hoy";
-            dot.className = "sync-dot";
-        } catch (e) {
-            console.error(e);
-            dot.style.background = "red";
-        }
-    }
+function renderMenu() {
+    // Tiempos
+    document.getElementById('list-tiempos').innerHTML = CONFIG.tiempos.map(t => 
+        `<div class="pill" onclick="selT(this, '${t.n}', ${t.p})">${t.n} — $${t.p.toLocaleString()}</div>`).join('');
+    
+    // Medias
+    document.getElementById('list-medias').innerHTML = CONFIG.medias.map(m => 
+        `<div class="pill" onclick="selM(this, '${m.n}', ${m.p})">${m.n}</div>`).join('');
+    
+    // Tienda
+    const fT = (cat) => CONFIG.tienda.filter(x => x.cat === cat).map(i => `
+        <div class="btn-tienda" onclick="ventaDirecta('${i.n}', ${i.p})">
+            <span style="font-weight:700;">${i.n}</span>
+            <span class="price-tag">$${i.p.toLocaleString()}</span>
+        </div>`).join('');
+    
+    document.getElementById('grid-bebidas').innerHTML = fT('bebida');
+    document.getElementById('grid-juguetes').innerHTML = fT('juguete');
+}
 
-    function renderEntradas() {
-        const cont = document.getElementById('entradas-list');
-        cont.innerHTML = CONFIG.entradas.map((e, index) => `
-            <div class="pill" onclick="selectEntrada(this, ${index})">${e.nombre}</div>
-        `).join('');
-    }
+function selT(el, n, p) {
+    document.querySelectorAll('#list-tiempos .pill').forEach(x => x.classList.remove('active'));
+    el.classList.add('active');
+    venta.tiempo = {n, p};
+    calc();
+}
 
-    function selectEntrada(el, index) {
-        document.querySelectorAll('#entradas-list .pill').forEach(p => p.classList.remove('active'));
+function selM(el, n, p) {
+    if(el.classList.contains('active')) {
+        el.classList.remove('active');
+        venta.media = null;
+    } else {
+        document.querySelectorAll('#list-medias .pill').forEach(x => x.classList.remove('active'));
         el.classList.add('active');
-        ventaActual.entrada = CONFIG.entradas[index];
-        calcularTotal();
+        venta.media = {n, p};
     }
+    calc();
+}
 
-    function toggleMedias(el) {
-        ventaActual.medias = !ventaActual.medias;
-        el.classList.toggle('active');
-        calcularTotal();
-    }
+function setPago(tipo, el) {
+    document.querySelectorAll('.pill-group .pill').forEach(x => {if(x.innerText.includes('💵') || x.innerText.includes('📱')) x.classList.remove('active')});
+    el.classList.add('active');
+    venta.pago = tipo;
+}
 
-    function calcularTotal() {
-        let total = (ventaActual.entrada?.precio || 0) + (ventaActual.medias ? CONFIG.precioMedias : 0);
-        document.getElementById('label-total').textContent = "$" + total.toLocaleString();
-    }
+function calc() {
+    let t = (venta.tiempo?.p || 0) + (venta.media?.p || 0);
+    document.getElementById('label-total').textContent = "$" + t.toLocaleString();
+}
 
-    async function registrarVenta() {
-        if (!ventaActual.entrada) return alert("Selecciona una entrada");
-        
-        const total = (ventaActual.entrada.precio) + (ventaActual.medias ? CONFIG.precioMedias : 0);
-        const registro = {
-            hoja: "Transacciones",
-            encabezados: ["Fecha", "Hora", "Tipo", "Detalle", "Pago", "Total"],
-            fila: [new Date().toLocaleDateString(), new Date().toLocaleTimeString(), "Entrada", ventaActual.entrada.nombre, "Efectivo", total]
-        };
+async function registrarEntrada() {
+    if(!venta.tiempo) return alert("Selecciona tiempo de entrada");
+    const total = (venta.tiempo.p) + (venta.media ? venta.media.p : 0);
+    const detalle = venta.tiempo.n + (venta.media ? " + " + venta.media.n : "");
+    
+    await enviar({
+        hoja: "Transacciones",
+        fila: [new Date().toLocaleDateString(), new Date().toLocaleTimeString(), "Entrada", detalle, venta.pago, total]
+    });
+}
 
-        document.getElementById('sync-status').className = "sync-dot loading";
-        
-        await fetch(GS_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            body: JSON.stringify(registro)
-        });
+async function ventaDirecta(n, p) {
+    if(!confirm(`¿Registrar venta de ${n} por $${p.toLocaleString()}?`)) return;
+    await enviar({
+        hoja: "Transacciones",
+        fila: [new Date().toLocaleDateString(), new Date().toLocaleTimeString(), "Tienda", n, "Efectivo", p]
+    });
+}
 
-        alert("¡Venta registrada!");
-        location.reload(); // Recarga para actualizar el total de la barra superior
-    }
+async function enviar(p) {
+    document.getElementById('sync-dot').className = "sync-dot loading";
+    try {
+        await fetch(GS_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(p) });
+        alert("✅ Registrado con éxito");
+        location.reload();
+    } catch(e) { alert("❌ Error"); }
+}
 
-    function changeView(view, btn) {
-        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-        document.getElementById('view-' + view).classList.add('active');
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        btn.classList.add('active');
-    }
+async function actualizarSincronizacion() {
+    try {
+        const r = await fetch(GS_URL + "?hoja=Transacciones");
+        const d = await r.json();
+        let h = new Date().toLocaleDateString();
+        let sum = 0;
+        d.filas.forEach(f => { if(f[0] === h) sum += parseFloat(f[5] || 0); });
+        document.getElementById('display-total-hoy').textContent = "$" + sum.toLocaleString() + " hoy";
+    } catch(e) {}
+}
+
+function v(view, btn) {
+    document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
+    document.getElementById('view-'+view).classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active'));
+    btn.classList.add('active');
+}
+
+function loadChart() {
+    // Aquí iría la lógica de Chart.js para mostrar las ventas por hora o categoría
+    console.log("Cargando Dashboard...");
+}
 </script>
-
 </body>
 </html>
-
