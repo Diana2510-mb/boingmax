@@ -423,16 +423,16 @@ body{font-family:'Nunito',sans-serif;background:var(--gray1);color:var(--text);m
 
 <script>
 // ===================== CONFIGURACIÓN URL =====================
-const GS_URL = "https://script.google.com/macros/s/AKfycbzeyZ8sdowzXPdew723dvNGQmw6LELtIkmxLO03hh4hFMQyp9152OuIy3fcCS1xeXaN/exec";
+const GS_URL = "https://script.google.com/macros/s/AKfycby4hr-grD5wKQMxddoP3OAfrRyI-g7TYO03XbajZmKB5UnVGyXbbP0PXFUz1J0j1Jw6/exec";
 
 // ===================== ESTADO =====================
 let CONFIG = {
   tarifas: [
-    {id:'1h', nombre:'1 hora', precio:25000},
-    {id:'30m', nombre:'30 minutos', precio:15000},
+    {id:'1h', nombre:'1 hora', precio:12000},
+    {id:'30m', nombre:'30 minutos', precio:7000},
     {id:'promo', nombre:'Promo 2×1 Martes/Jueves', precio:30000, esPromo:true},
   ],
-  precioMedias: 8500,
+  precioMedias: 3000,
   bebidas: [
     {id:'b1', nombre:'Agua 300ml', precio:2000, icon:'🥤'},
     {id:'b2', nombre:'Jugo Hit 250ml', precio:3000, icon:'🧃'},
@@ -506,7 +506,7 @@ async function enviarASheets(hoja, encabezados, fila){
 
 async function cargarDeSheets(hoja){
   try{
-    const r = await fetch(GS_URL+'?hoja='+encodeURIComponent(hoja));
+    const r = await fetch(GS_URL+'?hoja='+encodeURIComponent(hoja)+'&_='+Date.now(),{cache:'no-store'});
     const d = await r.json();
     return d.filas || [];
   } catch(e){
@@ -680,6 +680,55 @@ function updateSidebarTotal(){
   if(mob) mob.textContent=t;
 }
 
+/** Igualar fechas de la hoja (texto, ISO o Date) al formato local del registro */
+function normalizarFechaParaHoy(val){
+  if(val==null||val==='') return '';
+  if(val instanceof Date) return val.toLocaleDateString('es-CO');
+  const s=String(val).trim();
+  if(/^\d{4}-\d{2}-\d{2}/.test(s)){
+    const d=new Date(s.split('T')[0]+'T12:00:00');
+    if(!isNaN(d.getTime())) return d.toLocaleDateString('es-CO');
+  }
+  return s;
+}
+
+/** Al recargar la página, recuperar lo registrado hoy desde Sheets (misma hoja que el dashboard) */
+async function cargarHistorialHoyDesdeSheets(){
+  setSync('loading');
+  try{
+    const hoy=new Date().toLocaleDateString('es-CO');
+    const filas=await cargarDeSheets('Transacciones');
+    transacciones=[];
+    totalDia=efecDia=transfDia=0;
+    visitDia=0;
+    if(filas.length>1){
+      const deHoy=filas.slice(1).filter(r=>normalizarFechaParaHoy(r[0])===hoy);
+      [...deHoy].reverse().forEach(r=>{
+        const hora=String(r[1]||'');
+        const tipo=String(r[2]||'');
+        const desc=String(r[3]||'');
+        let pago=String(r[6]||'efectivo').toLowerCase();
+        if(pago!=='efectivo'&&pago!=='transferencia') pago='efectivo';
+        const total=parseFloat(r[7]);
+        const tot=Number.isFinite(total)?total:0;
+        transacciones.push({hora,tipo,desc,pago,total:tot});
+        acum(tot,pago);
+        if(tipo==='Entrada'){
+          const dl=desc.toLowerCase();
+          visitDia+=(dl.includes('promo')||dl.includes('2×1')||dl.includes('2x1'))?2:1;
+        }
+      });
+    }
+    updateSidebarTotal();
+    if(document.getElementById('view-historial').classList.contains('active')) renderHistorial();
+    setSync('ok');
+  }catch(e){
+    console.error(e);
+    setSync('err');
+    updateSidebarTotal();
+  }
+}
+
 // ===================== HISTORIAL =====================
 function renderHistorial(){
   document.getElementById('h-total').textContent=fmt(totalDia);
@@ -851,7 +900,7 @@ function addJuguete(){
 }
 
 async function guardarConfig(){
-  CONFIG.precioMedias=parseInt(document.getElementById('precio-medias').value)||8500;
+  CONFIG.precioMedias=parseInt(document.getElementById('precio-medias').value)||3000;
   showLoading('Guardando configuración...');
   // Guardar config en hoja Config
   const ok = await enviarASheets('Config',
@@ -881,6 +930,7 @@ async function cargarConfig(){
   renderEntradaPills();
   renderProductos();
   renderConfig();
+  await cargarHistorialHoyDesdeSheets();
 }
 
 // ===================== INIT =====================
